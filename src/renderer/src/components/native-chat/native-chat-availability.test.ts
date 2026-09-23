@@ -8,7 +8,8 @@ describe('canToggleNativeChat', () => {
       canToggleNativeChat({
         experimentalNativeChatEnabled: true,
         contentType: 'terminal',
-        launchAgent: 'claude'
+        launchAgent: 'claude',
+        nativeChatTranscriptIsLocalReadable: isNativeChatTranscriptLocalReadable(null)
       })
     ).toBe(true)
   })
@@ -19,7 +20,8 @@ describe('canToggleNativeChat', () => {
         experimentalNativeChatEnabled: true,
         contentType: 'terminal',
         launchAgent: null,
-        detectedAgent: 'codex'
+        detectedAgent: 'codex',
+        nativeChatTranscriptIsLocalReadable: isNativeChatTranscriptLocalReadable(null)
       })
     ).toBe(true)
   })
@@ -30,7 +32,8 @@ describe('canToggleNativeChat', () => {
         experimentalNativeChatEnabled: true,
         contentType: 'terminal',
         launchAgent: null,
-        resolvedAgent: 'claude'
+        resolvedAgent: 'claude',
+        nativeChatTranscriptIsLocalReadable: isNativeChatTranscriptLocalReadable(null)
       })
     ).toBe(true)
   })
@@ -40,7 +43,8 @@ describe('canToggleNativeChat', () => {
       canToggleNativeChat({
         experimentalNativeChatEnabled: true,
         contentType: 'terminal',
-        launchAgent: 'openclaude'
+        launchAgent: 'openclaude',
+        nativeChatTranscriptIsLocalReadable: isNativeChatTranscriptLocalReadable(null)
       })
     ).toBe(true)
   })
@@ -103,6 +107,37 @@ describe('canToggleNativeChat', () => {
     expect(forConnection('ssh-target-1')).toBe(false)
     expect(forConnection(null)).toBe(true)
     expect(forConnection('runtime-ssh-env-1')).toBe(true)
+  })
+
+  // Why (#13663): the file-backed reader only opens paths on the serving host, so a
+  // hook-reported Claude/Codex path on a Model-A SSH target is as unreachable as Grok's.
+  it.each(['claude', 'openclaude', 'codex'] as const)(
+    'rejects Model-A SSH %s but accepts it local and runtime-owned',
+    (launchAgent) => {
+      const forConnection = (connectionId: string | null | undefined): boolean =>
+        canToggleNativeChat({
+          experimentalNativeChatEnabled: true,
+          contentType: 'terminal',
+          launchAgent,
+          nativeChatTranscriptIsLocalReadable: isNativeChatTranscriptLocalReadable(connectionId)
+        })
+      expect(forConnection('ssh-target-1')).toBe(false)
+      expect(forConnection(undefined)).toBe(false)
+      expect(forConnection(null)).toBe(true)
+      expect(forConnection('runtime-ssh-env-1')).toBe(true)
+    }
+  )
+
+  it('lets an existing Model-A SSH Claude chat toggle back to terminal', () => {
+    expect(
+      canToggleNativeChat({
+        experimentalNativeChatEnabled: true,
+        contentType: 'terminal',
+        launchAgent: 'claude',
+        nativeChatTranscriptIsLocalReadable: false,
+        isChatViewMode: true
+      })
+    ).toBe(true)
   })
 
   it('lets an existing Model-A SSH Grok chat toggle back to terminal', () => {
@@ -232,7 +267,8 @@ describe('canSwitchNativeChatView', () => {
       canSwitchNativeChatView({
         experimentalNativeChatEnabled: true,
         contentType: 'terminal',
-        launchAgent: 'claude'
+        launchAgent: 'claude',
+        nativeChatTranscriptIsLocalReadable: isNativeChatTranscriptLocalReadable(null)
       })
     ).toBe(true)
   })

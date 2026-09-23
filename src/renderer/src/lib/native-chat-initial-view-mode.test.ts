@@ -12,7 +12,8 @@ describe('decideInitialAgentTabViewMode', () => {
       decideInitialAgentTabViewMode({
         experimentalNativeChat: true,
         openAgentTabsInChatByDefault: true,
-        agent: 'codex'
+        agent: 'codex',
+        nativeChatTranscriptIsLocalReadable: isNativeChatTranscriptLocalReadable(null)
       })
     ).toBe('chat')
   })
@@ -86,6 +87,24 @@ describe('decideInitialAgentTabViewMode', () => {
     expect(forConnection(null)).toBe('chat')
   })
 
+  // Why (#13663): a Claude/Codex hook path on a Model-A SSH target is a file on
+  // another machine; opening chat there renders an empty transcript forever.
+  it.each(['claude', 'codex'] as const)(
+    'keeps Model-A SSH %s in the terminal view but opens it local and runtime-owned',
+    (agent) => {
+      const forConnection = (connectionId: string | null): Tab['viewMode'] =>
+        decideInitialAgentTabViewMode({
+          experimentalNativeChat: true,
+          openAgentTabsInChatByDefault: true,
+          agent,
+          nativeChatTranscriptIsLocalReadable: isNativeChatTranscriptLocalReadable(connectionId)
+        })
+      expect(forConnection('ssh-target-1')).toBeUndefined()
+      expect(forConnection(null)).toBe('chat')
+      expect(forConnection('runtime-ssh-env-1')).toBe('chat')
+    }
+  )
+
   it('keeps Model-A SSH Grok in the terminal view', () => {
     expect(
       decideInitialAgentTabViewMode({
@@ -113,7 +132,8 @@ describe('decideInitialAgentTabViewMode', () => {
         openAgentTabsInChatByDefault: true,
         agent: 'claude',
         promptDelivery: 'draft',
-        launchDraftText: 'https://github.com/o/r/issues/12'
+        launchDraftText: 'https://github.com/o/r/issues/12',
+        nativeChatTranscriptIsLocalReadable: isNativeChatTranscriptLocalReadable(null)
       })
     ).toBe('chat')
   })
@@ -128,7 +148,8 @@ describe('decideInitialAgentTabViewMode', () => {
         openAgentTabsInChatByDefault: true,
         agent: 'claude',
         promptDelivery: 'draft',
-        launchDraftText
+        launchDraftText,
+        nativeChatTranscriptIsLocalReadable: isNativeChatTranscriptLocalReadable(null)
       })
     ).toBe('chat')
   })
@@ -156,7 +177,7 @@ describe('decideInitialAgentTabViewMode', () => {
           experimentalNativeChat: true,
           openAgentTabsInChatByDefault: true
         },
-        { agent: 'claude' }
+        { agent: 'claude', nativeChatTranscriptIsLocalReadable: true }
       )
     ).toEqual({ viewMode: 'chat' })
     expect(

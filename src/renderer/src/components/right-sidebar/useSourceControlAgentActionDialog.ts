@@ -204,6 +204,7 @@ export function useSourceControlAgentActionDialog({
       // Why: an SSH host runs the plain `orca` shim; keep the previewed command
       // label aligned with the real remote launch (no `orca-ide` rename).
       isRemote: typeof connectionId === 'string',
+      connectionId,
       launchSource,
       connectionUnavailable,
       refreshDetectedAgents,

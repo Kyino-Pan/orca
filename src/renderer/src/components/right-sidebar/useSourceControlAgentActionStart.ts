@@ -34,6 +34,7 @@ type UseSourceControlAgentActionStartArgs = {
   /** Why: SSH hosts launch the plain `orca` shim, so the previewed command must
    * drop the Linux-only `orca-ide` rename to match the real launch. */
   isRemote?: boolean
+  connectionId?: string | null
   launchSource: LaunchSource
   connectionUnavailable: boolean
   refreshDetectedAgents: () => Promise<TuiAgent[]>
@@ -87,6 +88,7 @@ export function useSourceControlAgentActionStart({
   promptDelivery,
   launchPlatform,
   isRemote,
+  connectionId,
   launchSource,
   connectionUnavailable,
   refreshDetectedAgents,
@@ -116,7 +118,8 @@ export function useSourceControlAgentActionStart({
         detectedAgents: currentDetectedAgents,
         connectionUnavailable,
         launchPlatform,
-        isRemote
+        isRemote,
+        connectionId
       })
     },
     [
@@ -128,7 +131,8 @@ export function useSourceControlAgentActionStart({
       refreshDetectedAgents,
       selectedAgent,
       launchPlatform,
-      isRemote
+      isRemote,
+      connectionId
     ]
   )
 

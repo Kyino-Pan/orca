@@ -7,9 +7,9 @@ import {
 } from '../../../src/shared/native-chat-agent-support'
 
 // Why: native chat renders an agent's own JSONL transcript, and the host
-// resolver knows these transcript layouts. Agents whose hook reports no
-// transcript path (Grok, omp) are additionally gated on host readability,
-// because Model-A SSH stores their transcript on the remote target.
+// resolver opens it on the serving host only. Model-A SSH keeps every agent's
+// transcript on the remote target, so eligibility is gated on host readability
+// for all transcript agents, hook-reported path or not (#13663).
 export function isMobileNativeChatTranscriptReadable(
   connectionId: string | null | undefined
 ): boolean {

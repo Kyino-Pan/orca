@@ -20,11 +20,11 @@ export function isNativeChatSupportedAgent(agent: string | null | undefined): bo
   return agent != null && NATIVE_CHAT_SUPPORTED_AGENTS.has(agent)
 }
 
-/** Agents whose Model-A SSH transcript reader is not supported. A hook path alone
- *  does not establish owning-host reads, so OMP remains gated even with metadata. */
+/** Every transcript-backed agent: the file-backed reader opens paths on the serving
+ *  host only, so a Model-A SSH transcript (on the target) must fail closed until it
+ *  is read on the execution host (#13663). A hook-reported path does not change that. */
 export function nativeChatRequiresLocalTranscript(agent: string | null | undefined): boolean {
-  const transcriptAgent = resolveNativeChatTranscriptAgent(agent)
-  return transcriptAgent === 'grok' || transcriptAgent === 'omp'
+  return resolveNativeChatTranscriptAgent(agent) !== null
 }
 
 /** True when the agent renders a digit-commit question selector that ignores

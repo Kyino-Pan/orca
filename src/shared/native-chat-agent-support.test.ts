@@ -34,14 +34,18 @@ describe('isNativeChatSupportedAgent', () => {
 })
 
 describe('nativeChatRequiresLocalTranscript', () => {
-  it('covers the agents whose hook discloses no transcript path', () => {
-    // Claude/Codex report `transcript_path`; Grok and omp report only an id, so
-    // native chat has to find their file on a disk this process can read.
+  it('gates every transcript-backed agent on a host-readable transcript', () => {
+    // Why (#13663): the file-backed reader resolves paths on the serving host
+    // only, so a hook-reported Claude/Codex path on a Model-A SSH target is as
+    // unreachable as the undisclosed Grok/omp one.
     expect(nativeChatRequiresLocalTranscript('grok')).toBe(true)
     expect(nativeChatRequiresLocalTranscript('omp')).toBe(true)
-    expect(nativeChatRequiresLocalTranscript('claude')).toBe(false)
-    expect(nativeChatRequiresLocalTranscript('openclaude')).toBe(false)
-    expect(nativeChatRequiresLocalTranscript('codex')).toBe(false)
+    expect(nativeChatRequiresLocalTranscript('claude')).toBe(true)
+    expect(nativeChatRequiresLocalTranscript('openclaude')).toBe(true)
+    expect(nativeChatRequiresLocalTranscript('codex')).toBe(true)
+  })
+
+  it('leaves agents without a native chat transcript ungated', () => {
     expect(nativeChatRequiresLocalTranscript('cursor')).toBe(false)
     expect(nativeChatRequiresLocalTranscript(null)).toBe(false)
     expect(nativeChatRequiresLocalTranscript(undefined)).toBe(false)

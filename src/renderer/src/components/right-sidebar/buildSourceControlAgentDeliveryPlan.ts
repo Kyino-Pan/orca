@@ -4,6 +4,7 @@ import type { TuiAgent } from '../../../../shared/tui-agent'
 import type { SourceControlAgentActionDeliveryPlanState } from './SourceControlAgentActionDialogForm'
 import { buildSourceControlAgentConnectionErrorPlan } from './source-control-agent-action-dialog-support'
 import { resolveInitialNativeChatSessionOptions } from '@/components/native-chat/native-chat-launch-session-options'
+import { isNativeChatTranscriptLocalReadable } from '@/lib/native-chat-transcript-readability'
 
 type BuildSourceControlAgentDeliveryPlanArgs = {
   selectedAgent: TuiAgent | null
@@ -16,6 +17,8 @@ type BuildSourceControlAgentDeliveryPlanArgs = {
   /** Why: keep the previewed command label in sync with the real remote launch,
    * which omits the Linux-only `orca-ide` rename for SSH hosts. */
   isRemote?: boolean
+  /** The worktree's SSH target (null = local); Model B `runtime-ssh-` targets still read the transcript. */
+  connectionId?: string | null
 }
 
 export function buildSourceControlAgentDeliveryPlan({
@@ -26,7 +29,8 @@ export function buildSourceControlAgentDeliveryPlan({
   detectedAgents,
   connectionUnavailable,
   launchPlatform,
-  isRemote
+  isRemote,
+  connectionId
 }: BuildSourceControlAgentDeliveryPlanArgs): SourceControlAgentActionDeliveryPlanState {
   if (connectionUnavailable) {
     return buildSourceControlAgentConnectionErrorPlan()
@@ -41,7 +45,7 @@ export function buildSourceControlAgentDeliveryPlan({
           agent: selectedAgent,
           promptDelivery,
           launchDraftText: commandInput.trim(),
-          nativeChatTranscriptIsLocalReadable: !isRemote
+          nativeChatTranscriptIsLocalReadable: isNativeChatTranscriptLocalReadable(connectionId)
         })
       : undefined,
     promptDelivery,

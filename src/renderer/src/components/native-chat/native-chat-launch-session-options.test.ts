@@ -23,10 +23,24 @@ describe('resolveInitialNativeChatSessionOptions', () => {
   })
 
   it('applies native-chat preferences when the launch resolves to chat', () => {
-    expect(resolveInitialNativeChatSessionOptions(settings, { agent: 'codex' })).toEqual({
+    expect(
+      resolveInitialNativeChatSessionOptions(settings, {
+        agent: 'codex',
+        nativeChatTranscriptIsLocalReadable: true
+      })
+    ).toEqual({
       model: 'gpt-5.2-codex',
       effort: 'medium'
     })
+  })
+
+  it('omits preferences when a Model-A SSH transcript keeps Codex in the terminal', () => {
+    expect(
+      resolveInitialNativeChatSessionOptions(settings, {
+        agent: 'codex',
+        nativeChatTranscriptIsLocalReadable: false
+      })
+    ).toBeUndefined()
   })
 
   it('omits preferences when a draft forces the initial view back to terminal', () => {
