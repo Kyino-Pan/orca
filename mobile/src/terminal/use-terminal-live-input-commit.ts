@@ -64,6 +64,7 @@ type TerminalLiveInputCommitHandlers = {
   readonly handleLiveInputSubmit: () => Promise<boolean>
 }
 
+/** Mirrors committed field text to the terminal while keeping native caret movement local. */
 export function useTerminalLiveInputCommit<TTabType extends string>({
   activeHandle,
   activeHandleRef,

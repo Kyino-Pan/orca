@@ -50,6 +50,7 @@ type AccessoryInputCommitHarness = {
   readonly unmount: () => void
 }
 
+/** Separates native selection from mirrored text so accessory edits can exercise either state. */
 function createAccessoryInputCommitHarness({
   composing,
   heldText = '',
@@ -93,6 +94,7 @@ function createAccessoryInputCommitHarness({
   let commit: AccessoryInputCommitHarness['commit'] | null = null
   let renderer: ReactTestRenderer | null = null
 
+  /** Mounts the real hook in React so callback dependencies follow the production lifecycle. */
   function Harness(): null {
     commit = useTerminalLiveAccessoryInputCommit({
       activeHandle,

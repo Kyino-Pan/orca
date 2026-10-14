@@ -46,6 +46,7 @@ type TerminalLiveAccessoryInputCommitOptions = {
   readonly waitForPendingLiveInputFlush: () => Promise<boolean>
 }
 
+/** Keeps accessory edits local and orders terminal controls after pending text has been sent. */
 export function useTerminalLiveAccessoryInputCommit({
   activeHandle,
   applyLiveInputMirror,

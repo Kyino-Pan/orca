@@ -24,6 +24,7 @@ import { styles } from './mobile-session-styles'
 import { useKeyboardPersistingTaps } from '../platform/keyboard-persisting-taps'
 import type { MobileSessionController } from './use-mobile-session-controller'
 
+/** Keeps live input directly editable so the native field owns caret movement and selection. */
 export function MobileSessionCommandDock({ controller }: { controller: MobileSessionController }) {
   const {
     insets,

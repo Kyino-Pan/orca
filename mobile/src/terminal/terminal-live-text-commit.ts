@@ -82,6 +82,7 @@ export function getTerminalLiveAccessoryBytesDecision({
   return { kind: 'send-now', bytes }
 }
 
+/** Uses native UTF-16 selection offsets; collapsed deletion preserves adjacent surrogate pairs. */
 export function getTerminalLiveAccessoryLocalEditText({
   localEdit,
   fieldText,

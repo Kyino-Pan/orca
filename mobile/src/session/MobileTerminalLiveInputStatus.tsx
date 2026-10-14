@@ -12,6 +12,7 @@ type MobileTerminalLiveInputStatusProps = {
   readonly isAttaching: boolean
 }
 
+/** Shows transient recording/upload status without intercepting touches meant for live input. */
 export function MobileTerminalLiveInputStatus({
   dictation,
   isAttaching
